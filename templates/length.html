@@ -1,27 +1,39 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Length Converter</title>
-</head>
-<body>
-    <nav>
-        <a href="/length">Length</a> | <a href="/weight">Weight</a> | <a href="/temperature">Temperature</a>
-    </nav>
-    <h2>Length Converter</h2>
-    <form method="POST" target="_self">
-        <input type="number" step="any" name="value" placeholder="Enter value" required>
-        <select name="from_unit">
-            {% for unit in units %}<option value="{{ unit }}">{{ unit }}</option>{% endfor %}
-        </select>
-        to
-        <select name="to_unit">
-            {% for unit in units %}<option value="{{ unit }}">{{ unit }}</option>{% endfor %}
-        </select>
-        <button type="submit">Convert</button>
-    </form>
+{% extends "base.html" %}
 
-    {% if result is not none %}
-        <h3>Converted Value: {{ result }}</h3>
-    {% endif %}
-</body>
-</html>
+{% block title %}Length Converter{% endblock %}
+
+{% block content %}
+<h2>Length Converter</h2>
+<form method="POST" target="_self">
+    <div class="form-group">
+        <label for="value">Value:</label>
+        <input type="number" step="any" name="value" id="value" value="{{ value if value != 0.0 else '' }}" placeholder="Enter numeric length" required>
+    </div>
+
+    <div class="form-group">
+        <label for="from_unit">Convert From:</label>
+        <select name="from_unit" id="from_unit">
+            {% for unit in units %}
+                <option value="{{ unit }}" {% if unit == from_unit %}selected{% endif %}>{{ unit | capitalize }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <div class="form-group">
+        <label for="to_unit">Convert To:</label>
+        <select name="to_unit" id="to_unit">
+            {% for unit in units %}
+                <option value="{{ unit }}" {% if unit == to_unit %}selected{% endif %}>{{ unit | capitalize }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <button type="submit">Convert Value</button>
+</form>
+
+{% if result is not none %}
+    <div class="result-box">
+        <h3>Result: {{ value }} {{ from_unit }} = <strong>{{ result }} {{ to_unit }}</strong></h3>
+    </div>
+{% endif %}
+{% endblock %}

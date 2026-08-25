@@ -1,6 +1,5 @@
 from flask import Flask, render_template, request
-from flask.typing import ResponseReturnValue
-from typing import Dict, List, Union
+from typing import Dict, List, Union, Any
 
 app = Flask(__name__)
 
@@ -44,7 +43,7 @@ def convert_temperature(value: float, from_unit: str, to_unit: str) -> float:
 
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/length', methods=['GET', 'POST'])
-def length_converter() -> ResponseReturnValue:
+def length_converter() -> Any:
     result: Union[float, None] = None
     value: float = 0.0
     from_unit: str = ""
@@ -66,7 +65,7 @@ def length_converter() -> ResponseReturnValue:
     )
 
 @app.route('/weight', methods=['GET', 'POST'])
-def weight_converter() -> ResponseReturnValue:
+def weight_converter() -> Any:
     result: Union[float, None] = None
     value: float = 0.0
     from_unit: str = ""
@@ -88,7 +87,7 @@ def weight_converter() -> ResponseReturnValue:
     )
 
 @app.route('/temperature', methods=['GET', 'POST'])
-def temperature_converter() -> ResponseReturnValue:
+def temperature_converter() -> Any:
     result: Union[float, None] = None
     value: float = 0.0
     from_unit: str = ""
