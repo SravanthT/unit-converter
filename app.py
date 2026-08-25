@@ -1,11 +1,11 @@
 from flask import Flask, render_template, request
-from typing import Union
+from flask.typing import ResponseReturnValue
+from typing import Dict, List, Union
+
 app = Flask(__name__)
 
-# --- Converstion Factors ---
-# 1 inch = 2.54 cm
-
-LENGTH_FACTORS = {
+# --- Conversion Factors ---
+LENGTH_FACTORS: Dict[str, float] = {
     'millimeter': 0.001,
     'centimeter': 0.01,
     'meter': 1.0,
@@ -14,10 +14,9 @@ LENGTH_FACTORS = {
     'foot': 0.3048,
     'yard': 0.9144,
     'mile': 1609.34
-    
 }
 
-WEIGHT_FACTORS = {
+WEIGHT_FACTORS: Dict[str, float] = {
     'milligram': 0.000001,
     'gram': 0.001,
     'kilogram': 1.0,
@@ -38,48 +37,78 @@ def convert_weight(value: float, from_unit: str, to_unit: str) -> float:
 def convert_temperature(value: float, from_unit: str, to_unit: str) -> float:
     if from_unit == to_unit:
         return value
-    # Convert to Celsius first
     c = value if from_unit == 'Celsius' else (value - 32) * 5/9 if from_unit == 'Fahrenheit' else value - 273.15
-    # Convert from Celsius to target
     return c if to_unit == 'Celsius' else (c * 9/5) + 32 if to_unit == 'Fahrenheit' else c + 273.15
 
 # -- Routes --
+
 @app.route('/', methods=['GET', 'POST'])
 @app.route('/length', methods=['GET', 'POST'])
-def length_converter():
-    result = Union[float, None] = None
-    value = None
-    from_unit = None
-    to_unit = None
-
+def length_converter() -> ResponseReturnValue:
+    result: Union[float, None] = None
+    value: float = 0.0
+    from_unit: str = ""
+    to_unit: str = ""
+    
     if request.method == 'POST':
-        value = float(request.form['value'])
-        from_unit = request.form['from_unit']
-        to_unit = request.form['to_unit']
+        value = float(request.form.get('value', 0.0))
+        from_unit = request.form.get('from_unit', '')
+        to_unit = request.form.get('to_unit', '')
         result = round(convert_length(value, from_unit, to_unit), 4)
-    return render_template('length.html', result=result, value=value, from_unit=from_unit, to_unit=to_unit, units=LENGTH_FACTORS.keys())
+        
+    return render_template(
+        'length.html', 
+        result=result, 
+        value=value, 
+        from_unit=from_unit, 
+        to_unit=to_unit, 
+        units=list(LENGTH_FACTORS.keys())
+    )
 
 @app.route('/weight', methods=['GET', 'POST'])
-def weight_converter():
+def weight_converter() -> ResponseReturnValue:
+    result: Union[float, None] = None
+    value: float = 0.0
+    from_unit: str = ""
+    to_unit: str = ""
+    
     if request.method == 'POST':
-        value = float(request.form['value'])
-        from_unit = request.form['from_unit']
-        to_unit = request.form['to_unit']
+        value = float(request.form.get('value', 0.0))
+        from_unit = request.form.get('from_unit', '')
+        to_unit = request.form.get('to_unit', '')
         result = round(convert_weight(value, from_unit, to_unit), 4)
-        return render_template('weight.html', result=result, value=value, from_unit=from_unit, to_unit=to_unit, units=WEIGHT_FACTORS.keys())
-    return render_template('weight.html', result=None, value=None, from_unit=None, to_unit=None, units=WEIGHT_FACTORS.keys())
+        
+    return render_template(
+        'weight.html', 
+        result=result, 
+        value=value, 
+        from_unit=from_unit, 
+        to_unit=to_unit, 
+        units=list(WEIGHT_FACTORS.keys())
+    )
 
 @app.route('/temperature', methods=['GET', 'POST'])
-def temperature_converter():
-    TEMPERATURE_UNITS = ['Celsius', 'Fahrenheit', 'Kelvin']
+def temperature_converter() -> ResponseReturnValue:
+    result: Union[float, None] = None
+    value: float = 0.0
+    from_unit: str = ""
+    to_unit: str = ""
+    temp_units: List[str] = ['Celsius', 'Fahrenheit', 'Kelvin']
+    
     if request.method == 'POST':
-        value = float(request.form['value'])
-        from_unit = request.form['from_unit']
-        to_unit = request.form['to_unit']
+        value = float(request.form.get('value', 0.0))
+        from_unit = request.form.get('from_unit', '')
+        to_unit = request.form.get('to_unit', '')
         result = round(convert_temperature(value, from_unit, to_unit), 4)
-        return render_template('temp.html', result=result, value=value, from_unit=from_unit, to_unit=to_unit, units=TEMPERATURE_UNITS)
-    return render_template('temp.html', result=None, value=None, from_unit=None, to_unit=None, units=TEMPERATURE_UNITS  )
+        
+    return render_template(
+        'temp.html', 
+        result=result, 
+        value=value, 
+        from_unit=from_unit, 
+        to_unit=to_unit, 
+        units=temp_units
+    )
 
 if __name__ == '__main__':
     app.run(debug=True)
-    
